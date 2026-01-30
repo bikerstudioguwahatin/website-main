@@ -1,0 +1,36 @@
+{
+  "videos": [
+    {
+      "id": "1",
+      "title": "HJG Latest Model Fog Light",
+      "videoUrl": "https://youtube.com/shorts/rvLVVx00UzQ?si=eRmmRYGQg_WTkARa",
+      "views": "125K",
+      "duration": "0:58",
+      "slug": "fog-lights"
+    },
+    {
+      "id": "2",
+      "title": "Red Rooster performance exhaust",
+      "videoUrl": "https://youtube.com/shorts/UXm4VBu_Jcc?si=RcdcbRlqXS2F3HMZ",
+      "views": "89K",
+      "duration": "0:45",
+      "slug": "exhaust"
+    },
+    {
+      "id": "3",
+      "title": "Himalayan 450 crash guard",
+      "videoUrl": "https://youtube.com/shorts/N8CsSR5GL-w?si=ccS0FB22KchnTPDc",
+      "views": "210K",
+      "duration": "1:02",
+      "slug": "crash-guards"
+    },
+    {
+      "id": "4",
+      "title": "Bar end Mirror",
+      "videoUrl": "https://youtube.com/shorts/XZwOuvLUBR8?si=nR_apI7erXRjKcVS",
+      "views": "210K",
+      "duration": "1:02",
+      "slug": "mirrors"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "testimonials": [
+    {
+      "id": "1",
+      "name": "Spandan Sen",
+      "review": "Amazing bikes and top-notch service! The ride quality is excellent and delivery was super fast. Highly recommended for all bike lovers.",
+      "rating": 5,
+      "location": "Mumbai, India"
+    },
+    {
+      "id": "2",
+      "name": "Rahul Sharma",
+      "review": "Best bike shop in the city! They helped me choose the perfect bike for my needs. The staff is knowledgeable and friendly. Very satisfied with my purchase!",
+      "rating": 5,
+      "location": "Delhi, India"
+    },
+    {
+      "id": "3",
+      "name": "Priya Patel",
+      "review": "Excellent customer service and great selection of bikes. The quality of products is outstanding and prices are reasonable. Will definitely buy again!",
+      "rating": 5,
+      "location": "Bangalore, India"
+    },
+    {
+      "id": "4",
+      "name": "Amit Kumar",
+      "review": "Love my new bike! The team was very helpful throughout the buying process. They even provided great tips on maintenance. Highly recommended!",
+      "rating": 5,
+      "location": "Chennai, India"
+    },
+    {
+      "id": "5",
+      "name": "Vikram Singh",
+      "review": "Professional service and premium quality bikes. The after-sales support is excellent. This is my go-to place for all biking needs!",
+      "rating": 4,
+      "location": "Pune, India",
+      "image": ""
+    }
+  ]
+}
