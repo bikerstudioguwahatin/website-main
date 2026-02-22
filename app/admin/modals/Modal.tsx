@@ -1,4 +1,5 @@
-// admin/modals/Modal.tsx
+// admin/modals/Modal.tsx - CORRECTED VERSION
+// Only sends fields that exist in the Bike Prisma model
 
 "use client"
 import React, { useState, useEffect } from 'react';
@@ -83,6 +84,34 @@ export const Modal: React.FC<ModalProps> = ({
     }
   };
 
+  // Helper function to convert empty strings to null
+  const emptyToNull = (value: any) => {
+    if (value === '' || value === undefined) return null;
+    return value;
+  };
+
+  // Helper function to parse integer fields
+  const parseIntField = (value: any) => {
+    if (value === '' || value === null || value === undefined) return null;
+    const parsed = parseInt(value);
+    return isNaN(parsed) ? null : parsed;
+  };
+
+  // Prepare bike data - ONLY FIELDS THAT EXIST IN PRISMA SCHEMA
+  const prepareBikeData = (data: any) => {
+    return {
+      name: data.name,           // Required
+      slug: data.slug,           // Required
+      brandId: data.brandId,     // Required
+      model: data.model,         // Required
+      year: parseIntField(data.year),  // Required Int
+      description: emptyToNull(data.description), // Optional
+      image: emptyToNull(data.image),   // Required (but can be empty initially)
+      isActive: data.isActive ?? true,  // Boolean with default
+      position: parseIntField(data.position) ?? 0 // Int with default
+    };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -90,25 +119,35 @@ export const Modal: React.FC<ModalProps> = ({
     console.log('Active Tab:', activeTab);
     console.log('Modal Type:', type);
     console.log('Item ID:', item?.id);
-    console.log('Form Data:', formData);
+    console.log('Raw Form Data:', formData);
     
     let endpoint = `/${activeTab}`;
     let method: 'POST' | 'PUT' = type === 'create' ? 'POST' : 'PUT';
     
-    const dataToSend = { ...formData };
-    
-    if (activeTab === 'products') {
-      dataToSend.images = images;
+    let dataToSend: any;
+
+    // Special handling for bikes tab - ONLY SEND FIELDS THAT EXIST
+    if (activeTab === 'bikes') {
+      dataToSend = prepareBikeData(formData);
+      console.log('Prepared Bike Data (only valid fields):', dataToSend);
+    } 
+    // Special handling for products tab
+    else if (activeTab === 'products') {
+      dataToSend = { ...formData, images };
       if (images.length > 0) {
         dataToSend.thumbnail = images[0];
       }
+    } 
+    // Default handling for other tabs
+    else {
+      dataToSend = { ...formData };
     }
     
     if (type === 'edit' && item?.id) {
       endpoint = `${endpoint}/${item.id}`;
     }
     
-    console.log('Endpoint:', endpoint);
+    console.log('Final Endpoint:', endpoint);
     console.log('Method:', method);
     console.log('Data to Send:', JSON.stringify(dataToSend, null, 2));
     
@@ -215,6 +254,8 @@ export const Modal: React.FC<ModalProps> = ({
               formData={formData}
               setFormData={setFormData}
               brands={brands}
+              onImageUpload={onImageUpload}
+              uploadingImage={uploadingImage}
             />
           )}
 

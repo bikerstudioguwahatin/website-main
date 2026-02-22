@@ -139,63 +139,165 @@ export const BrandForm: React.FC<BrandFormProps> = ({ formData, setFormData, onI
   </>
 );
 
-// Bike Form
+// ============================================
+// BIKE FORM - FIXED VERSION WITH ALL REQUIRED FIELDS
+// ============================================
 interface BikeFormProps {
   formData: any;
   setFormData: (data: any) => void;
   brands: Brand[];
+  onImageUpload?: (e: React.ChangeEvent<HTMLInputElement>, callback: (url: string) => void) => void;
+  uploadingImage?: boolean;
 }
 
-export const BikeForm: React.FC<BikeFormProps> = ({ formData, setFormData, brands }) => (
-  <>
-    <div>
-      <label className="block text-sm font-medium mb-2 text-black">Bike Name *</label>
-      <input
-        type="text"
-        required
-        className="w-full px-4 py-2 border rounded-lg text-black"
-        value={formData.name || ''}
-        onChange={(e) => setFormData({...formData, name: e.target.value})}
-      />
-    </div>
-    <div>
-      <label className="block text-sm font-medium mb-2 text-black">Brand *</label>
-      <select
-        required
-        className="w-full px-4 py-2 border rounded-lg text-black"
-        value={formData.brandId || ''}
-        onChange={(e) => setFormData({...formData, brandId: e.target.value})}
-      >
-        <option value="">Select Brand</option>
-        {brands.map(brand => (
-          <option key={brand.id} value={brand.id}>{brand.name}</option>
-        ))}
-      </select>
-    </div>
-    <div className="grid grid-cols-2 gap-4">
+export const BikeForm: React.FC<BikeFormProps> = ({ 
+  formData, 
+  setFormData, 
+  brands,
+  onImageUpload,
+  uploadingImage 
+}) => {
+  // Auto-generate slug from name
+  const handleNameChange = (name: string) => {
+    const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    setFormData({
+      ...formData, 
+      name,
+      slug: formData.slug || slug // Only auto-set if slug is empty
+    });
+  };
+
+  return (
+    <>
       <div>
-        <label className="block text-sm font-medium mb-2 text-black">Model *</label>
+        <label className="block text-sm font-medium mb-2 text-black">Bike Name *</label>
         <input
           type="text"
           required
           className="w-full px-4 py-2 border rounded-lg text-black"
-          value={formData.model || ''}
-          onChange={(e) => setFormData({...formData, model: e.target.value})}
+          value={formData.name || ''}
+          onChange={(e) => handleNameChange(e.target.value)}
+          placeholder="e.g., Ninja 400"
         />
       </div>
+      
       <div>
-        <label className="block text-sm font-medium mb-2 text-black">Year *</label>
+        <label className="block text-sm font-medium mb-2 text-black">Slug *</label>
         <input
-          type="number"
+          type="text"
+          required
+          className="w-full px-4 py-2 border rounded-lg text-black bg-gray-50"
+          value={formData.slug || ''}
+          onChange={(e) => setFormData({...formData, slug: e.target.value})}
+          placeholder="Auto-generated from name"
+        />
+        <p className="text-xs text-gray-500 mt-1">Auto-generated from name (URL-friendly)</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2 text-black">Brand *</label>
+        <select
           required
           className="w-full px-4 py-2 border rounded-lg text-black"
-          value={formData.year || new Date().getFullYear()}
-          onChange={(e) => setFormData({...formData, year: e.target.value})}
+          value={formData.brandId || ''}
+          onChange={(e) => setFormData({...formData, brandId: e.target.value})}
+        >
+          <option value="">Select Brand</option>
+          {brands.map(brand => (
+            <option key={brand.id} value={brand.id}>{brand.name}</option>
+          ))}
+        </select>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium mb-2 text-black">Model *</label>
+          <input
+            type="text"
+            required
+            className="w-full px-4 py-2 border rounded-lg text-black"
+            value={formData.model || ''}
+            onChange={(e) => setFormData({...formData, model: e.target.value})}
+            placeholder="e.g., 400"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2 text-black">Year *</label>
+          <input
+            type="number"
+            required
+            min="1900"
+            max={new Date().getFullYear() + 1}
+            className="w-full px-4 py-2 border rounded-lg text-black"
+            value={formData.year || new Date().getFullYear()}
+            onChange={(e) => setFormData({...formData, year: parseInt(e.target.value) || new Date().getFullYear()})}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2 text-black">Description</label>
+        <textarea
+          rows={3}
+          className="w-full px-4 py-2 border rounded-lg text-black"
+          value={formData.description || ''}
+          onChange={(e) => setFormData({...formData, description: e.target.value})}
+          placeholder="Optional description of the bike"
         />
       </div>
-    </div>
-  </>
-);
+
+      <div>
+        <label className="block text-sm font-medium mb-2 text-black">Bike Image *</label>
+        <div className="space-y-2">
+          {formData.image && (
+            <img 
+              src={formData.image} 
+              alt="Bike preview" 
+              className="w-full h-48 object-cover border rounded" 
+            />
+          )}
+          {onImageUpload && (
+            <label className="inline-block px-4 py-2 bg-gray-100 border rounded-lg cursor-pointer hover:bg-gray-200">
+              <ImageIcon size={16} className="inline mr-2" />
+              <span className="text-black">{uploadingImage ? 'Uploading...' : 'Upload Bike Image'}</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => onImageUpload(e, (url) => setFormData({...formData, image: url}))}
+                disabled={uploadingImage}
+              />
+            </label>
+          )}
+          {!formData.image && (
+            <p className="text-sm text-red-600">* Image is required</p>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-2 text-black">Position</label>
+        <input
+          type="number"
+          min="0"
+          className="w-full px-4 py-2 border rounded-lg text-black"
+          value={formData.position ?? 0}
+          onChange={(e) => setFormData({...formData, position: parseInt(e.target.value) || 0})}
+        />
+        <p className="text-xs text-gray-500 mt-1">Display order (lower numbers appear first)</p>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={formData.isActive ?? true}
+          onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
+        />
+        <span className="text-sm text-black">Active (visible on website)</span>
+      </div>
+    </>
+  );
+};
 
 interface BannerFormProps {
   formData: any;
@@ -230,21 +332,15 @@ export const BannerForm: React.FC<BannerFormProps> = ({
         onChange={(e) => setFormData({...formData, subtitle: e.target.value})}
       />
     </div>
-    
-    {/* Desktop Image */}
     <div>
-      <label className="block text-sm font-medium mb-2 text-black">Desktop Image *</label>
+      <label className="block text-sm font-medium mb-2 text-black">Banner Image</label>
       <div className="space-y-2">
         {formData.image && (
-          <img 
-            src={formData.image} 
-            alt="Desktop Preview" 
-            className="w-full h-48 object-cover border rounded" 
-          />
+          <img src={formData.image} alt="Banner" className="w-full h-48 object-cover border rounded" />
         )}
         <label className="inline-block px-4 py-2 bg-gray-100 border rounded-lg cursor-pointer hover:bg-gray-200">
           <ImageIcon size={16} className="inline mr-2" />
-          <span className="text-black">{uploadingImage ? 'Uploading...' : 'Upload Desktop Image'}</span>
+          <span className="text-black">{uploadingImage ? 'Uploading...' : 'Upload Image'}</span>
           <input
             type="file"
             accept="image/*"
@@ -253,57 +349,25 @@ export const BannerForm: React.FC<BannerFormProps> = ({
             disabled={uploadingImage}
           />
         </label>
-        <p className="text-xs text-gray-500">Recommended: 1920x800px (Desktop)</p>
       </div>
     </div>
-
-    {/* Mobile Image */}
     <div>
-      <label className="block text-sm font-medium mb-2 text-black">Mobile Image (Optional)</label>
-      <div className="space-y-2">
-        {formData.mobileImage && (
-          <img 
-            src={formData.mobileImage} 
-            alt="Mobile Preview" 
-            className="w-64 h-48 object-cover border rounded" 
-          />
-        )}
-        <label className="inline-block px-4 py-2 bg-gray-100 border rounded-lg cursor-pointer hover:bg-gray-200">
-          <ImageIcon size={16} className="inline mr-2" />
-          <span className="text-black">{uploadingImage ? 'Uploading...' : 'Upload Mobile Image'}</span>
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => onImageUpload(e, (url) => setFormData({...formData, mobileImage: url}))}
-            disabled={uploadingImage}
-          />
-        </label>
-        <p className="text-xs text-gray-500">Recommended: 768x600px (Mobile)</p>
-      </div>
-    </div>
-
-    <div>
-      <label className="block text-sm font-medium mb-2 text-black">Link (Optional)</label>
+      <label className="block text-sm font-medium mb-2 text-black">Link URL</label>
       <input
-        type="text"
-        placeholder="/products/ninja-400"
+        type="url"
         className="w-full px-4 py-2 border rounded-lg text-black"
         value={formData.link || ''}
         onChange={(e) => setFormData({...formData, link: e.target.value})}
       />
-      <p className="text-xs text-gray-500 mt-1">Where should the button link to?</p>
     </div>
-
     <div>
       <label className="block text-sm font-medium mb-2 text-black">Position</label>
       <input
         type="number"
         className="w-full px-4 py-2 border rounded-lg text-black"
-        value={formData.position ?? 0}
-        onChange={(e) => setFormData({...formData, position: parseInt(e.target.value) || 0})}
+        value={formData.position || 0}
+        onChange={(e) => setFormData({...formData, position: e.target.value})}
       />
-      <p className="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
     </div>
 
     <div className="flex items-center gap-2">
